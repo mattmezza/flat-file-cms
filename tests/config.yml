@@ -1,0 +1,7 @@
+posts_dir: "tests/posts"
+posts_per_page: 5
+pages_dir: "tests/pages"
+users_dir: "tests/users"
+cache_dir: "tests/cache"
+cache_enabled: yes
+url: "http://localhost:8000/"

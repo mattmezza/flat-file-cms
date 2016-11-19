@@ -1,0 +1,12 @@
+username: mattmezza
+password: password
+encryption: plain
+email: "mattmezza@gmail.com"
+role: admin
+metas:
+  - name: Matteo
+  - surname: Merola
+  - bio: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus."
+  - skype: matteomerola
+  - facebook: matteo.merola
+  - twitter: _mattmezza_
