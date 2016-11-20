@@ -10,6 +10,7 @@ class Post extends Content {
 	protected $year;
 	protected $month;
 	protected $day;
+	protected $date;
 
 	public function add_tag($tag) {
 		if(!$this->has_tag($tag))

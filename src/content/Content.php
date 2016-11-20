@@ -8,6 +8,7 @@ abstract class Content {
 	protected $slug;
 	protected $metas;
 	protected $html;
+	protected $url;
 
 	public function __get($property) {
         if (property_exists($this, $property)) {
