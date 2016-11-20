@@ -3,7 +3,7 @@
 namespace FlatFileCMS\Users;
 use \Symfony\Component\Yaml\Yaml;
 
-class UsersManager {
+class Users {
 
 	private $conf;
 	private $users_dir;
@@ -44,6 +44,23 @@ class UsersManager {
 	public function edit($user) {
 		$this->delete($user->username);
 		$this->write($user);
+	}
+
+	public function list($reverse = true) {
+		if ($reverse)
+      return array_reverse(glob($this->users_dir . DIRECTORY_SEPARATOR . "*.yml"));
+    else
+      return glob($this->users_dir . DIRECTORY_SEPARATOR . "*.yml");
+	}
+
+	public function users() {
+		$elems = $this->list();
+		$users = [];
+		foreach ($elems as $el) {
+			$id = str_replace(".yml", "", str_replace($this->users_dir, "", $el));
+			$users[] = $this->read($id);
+		}
+		return $users;
 	}
 
 }
