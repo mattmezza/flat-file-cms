@@ -5,4 +5,6 @@ php:
   - nightly
 before_script:
   - composer install -n --no-interaction
-script: phpunit --bootstrap vendor/autoload.php tests/GeneralTest.php
+script:
+  - phpunit --bootstrap vendor/autoload.php tests/GeneralTest.php
+  - phpunit --bootstrap vendor/autoload.php tests/WriteTest.php

@@ -20,7 +20,7 @@ class Pages extends Contents {
 	}
 
   public function delete($slug) {
-		return unlink($this->pages_dir."/".$slug.".md");
+    return (unlink($this->pages_dir."/".$slug.".md") && unlink($this->pages_dir."/".$slug.".yml"));
 	}
 
   public function read($slug) {
@@ -35,11 +35,11 @@ class Pages extends Contents {
   }
 
   public function write($page) {
-		file_put_contents($this->pages_dir."/".$page->slug.".md", $page->markdown);
-		file_put_contents($this->pages_dir."/".$page->slug.".yml", Yaml::dump($page->metas));
+		file_put_contents(rtrim($this->pages_dir,"/")."/".$page->slug.".md", $page->markdown);
+		file_put_contents(rtrim($this->pages_dir,"/")."/".$page->slug.".yml", Yaml::dump($page->metas));
 	}
 
-  public function list($reverse = true) {
+  public function list_all($reverse = true) {
     if ($reverse)
       return array_reverse(glob($this->pages_dir . DIRECTORY_SEPARATOR . "*.md"));
     else
@@ -47,7 +47,7 @@ class Pages extends Contents {
   }
 
   public function links() {
-    $pages = $this->list();
+    $pages = $this->list_all();
     $links = array();
     foreach($pages as $el){
       $name_ext = ltrim(str_replace($this->pages_dir,'',$el), "/");
@@ -55,6 +55,10 @@ class Pages extends Contents {
       $links[] = $link;
     }
     return $links;
+  }
+
+  public function pages_dir() {
+    return $this->pages_dir;
   }
 
 }

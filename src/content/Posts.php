@@ -41,10 +41,10 @@ class Posts extends Contents {
 	}
 
   public function delete($slug) {
-		return unlink($this->posts_dir."/".$slug.".md");
+		return (unlink($this->posts_dir."/".$slug.".md") && unlink($this->posts_dir."/".$slug.".yml"));
 	}
 
-  public function list($reverse = true) {
+  public function list_all($reverse = true) {
     if ($reverse)
       return array_reverse(glob($this->posts_dir . DIRECTORY_SEPARATOR . "*.md"));
     else
@@ -52,7 +52,7 @@ class Posts extends Contents {
   }
 
   public function links() {
-    $posts = $this->list();
+    $posts = $this->list_all();
     $links = array();
     foreach($posts as $k=>$v){
       $arr = explode('_', $v);
@@ -70,7 +70,7 @@ class Posts extends Contents {
     if($perpage == 0){
       $perpage = $this->posts_per_page;
     }
-    $posts_files = $this->list();
+    $posts_files = $this->list_all();
     // Extract a specific page with results
     $posts_files = array_slice($posts_files, ($page-1) * $perpage, $perpage);
     $posts = array();
@@ -86,7 +86,7 @@ class Posts extends Contents {
   }
 
   public function find($year, $month, $day, $name){
-    foreach($this->list() as $el) {
+    foreach($this->list_all() as $el) {
       $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       if($slug=="$year-$month-$day"."_$name") {
         if($this->cache_enabled) {
@@ -101,7 +101,7 @@ class Posts extends Contents {
 
   public function year($year){
     $posts = [];
-    foreach($this->list() as $el) {
+    foreach($this->list_all() as $el) {
       $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("-", $slug);
       if($bits[0]==$year) {
@@ -117,7 +117,7 @@ class Posts extends Contents {
 
   public function month($year, $month){
     $posts = [];
-    foreach($this->list() as $el) {
+    foreach($this->list_all() as $el) {
       $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("-", $slug);
       if($bits[0]==$year && $bits[1]==$month) {
@@ -133,7 +133,7 @@ class Posts extends Contents {
 
   public function day($year, $month, $day){
     $posts = [];
-    foreach($this->list() as $el) {
+    foreach($this->list_all() as $el) {
       $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("-", $slug);
       if($bits[0]==$year && $bits[1]==$month && $bits[2]==$day) {
@@ -149,7 +149,7 @@ class Posts extends Contents {
 
   public function name($name) {
     $posts = [];
-    foreach($this->list() as $el) {
+    foreach($this->list_all() as $el) {
       $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("_", $slug);
       if(strpos($name, $bits[1])!==false) {
@@ -164,13 +164,17 @@ class Posts extends Contents {
   }
 
   public function pagination($page = 1){
-    $total = count($this->list());
+    $total = count($this->list_all());
     return array(
       'prev'=> $page > 1,
       'prevpage'=>$page-1,
       'next'=> $total > $page*$this->posts_per_page,
       'nextpage'=>$page+1
     );
+  }
+
+  public function posts_dir() {
+    return $this->posts_dir;
   }
 
 }

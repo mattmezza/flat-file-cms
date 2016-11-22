@@ -25,13 +25,13 @@ class GeneralTest extends TestCase {
   }
 
   public function test_get_post_names() {
-    $posts_names = $this->cms->posts->list();
-    $this->assertEquals(count($posts_names), 1);
+    $posts_names = $this->cms->posts->list_all();
+    $this->assertGreaterThan(0, count($posts_names));
   }
 
   public function test_get_page_names() {
-    $pages_names = $this->cms->pages->list();
-    $this->assertEquals(count($pages_names), 1);
+    $pages_names = $this->cms->pages->list_all();
+    $this->assertGreaterThan(0, count($pages_names));
   }
 
   /**
