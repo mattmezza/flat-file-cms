@@ -24,8 +24,8 @@ class WriteTest extends TestCase {
     );
     $page->markdown = "# test1";
     $this->cms->pages->write($page);
-    $this->assertTrue(file_exists(ltrim($this->cms->pages->pages_dir(), "/")."/".$page->slug.".md"));
-    $this->assertTrue(file_exists(ltrim($this->cms->pages->pages_dir(), "/")."/".$page->slug.".yml"));
+    $this->assertTrue(file_exists($this->cms->pages->dir()."/".$page->slug.".md"));
+    $this->assertTrue(file_exists($this->cms->pages->dir()."/".$page->slug.".yml"));
   }
 
   /**
@@ -34,8 +34,8 @@ class WriteTest extends TestCase {
   */
   public function test_delete_page() {
     $this->cms->pages->delete("test1");
-    $this->assertFalse(file_exists(ltrim($this->cms->pages->pages_dir(), "/")."/test1.md"));
-    $this->assertFalse(file_exists(ltrim($this->cms->pages->pages_dir(), "/")."/test1.yml"));
+    $this->assertFalse(file_exists($this->cms->pages->dir()."/test1.md"));
+    $this->assertFalse(file_exists($this->cms->pages->dir()."/test1.yml"));
   }
 
 }

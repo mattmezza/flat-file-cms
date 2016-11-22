@@ -72,11 +72,6 @@ class GeneralTest extends TestCase {
     $this->assertEquals($posts_links[0], "http://localhost:8000/2016/11/15/test");
   }
 
-  public function test_users() {
-    $users = $this->cms->users->users();
-    $this->assertEquals(count($users), 1);
-  }
-
 }
 
  ?>

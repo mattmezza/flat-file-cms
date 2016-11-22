@@ -8,3 +8,4 @@ before_script:
 script:
   - phpunit --bootstrap vendor/autoload.php tests/GeneralTest.php
   - phpunit --bootstrap vendor/autoload.php tests/WriteTest.php
+  - phpunit --bootstrap vendor/autoload.php tests/UsersTest.php

@@ -7,28 +7,27 @@ use \FlatFileCMS\Exceptions\ContentNotFound;
 
 class Posts extends Contents {
 
-  private $posts_dir;
 	private $posts_per_page;
 
   public function __construct($conf) {
     parent::__construct($conf);
-    $this->posts_dir = $this->conf["posts_dir"];
-    $this->posts_per_page = $this->conf["posts_per_page"];
+    $this->dir = rtrim($this->conf["posts.dir"], "/");
+    $this->posts_per_page = intval($this->conf["posts.per_page"]);
   }
 
   public function write($post) {
-		file_put_contents($this->posts_dir."/".$post->full_slug().".md", $post->markdown);
-		file_put_contents($this->posts_dir."/".$post->full_slug().".yml", Yaml::dump($post->metas));
+		file_put_contents($this->dir."/".$post->full_slug().".md", $post->markdown);
+		file_put_contents($this->dir."/".$post->full_slug().".yml", Yaml::dump($post->metas));
 	}
 
   public function read($slug) {
-    $filename = $this->posts_dir."/".$slug.".md";
+    $filename = $this->dir."/".$slug.".md";
     if(!file_exists($filename))
       throw new ContentNotFound($slug, $filename, ContentNotFound::POST);
     $post = new Post();
     $post->markdown = file_get_contents($filename);
     $post->html = $this->parsedown->text($post->markdown);
-    $filename_metas = $this->posts_dir."/".$slug.".yml";
+    $filename_metas = $this->dir."/".$slug.".yml";
     if(!file_exists($filename))
       throw new ContentNotFound($slug, $filename_metas, ContentNotFound::METAS);
     $post->metas = file_get_contents($filename_metas);
@@ -41,14 +40,14 @@ class Posts extends Contents {
 	}
 
   public function delete($slug) {
-		return (unlink($this->posts_dir."/".$slug.".md") && unlink($this->posts_dir."/".$slug.".yml"));
+		return (unlink($this->dir."/".$slug.".md") && unlink($this->dir."/".$slug.".yml"));
 	}
 
   public function list_all($reverse = true) {
     if ($reverse)
-      return array_reverse(glob($this->posts_dir . DIRECTORY_SEPARATOR . "*.md"));
+      return array_reverse(glob($this->dir . "/" . "*.md"));
     else
-      return glob($this->posts_dir . DIRECTORY_SEPARATOR . "*.md");
+      return glob($this->dir . "/" . "*.md");
   }
 
   public function links() {
@@ -56,11 +55,10 @@ class Posts extends Contents {
     $links = array();
     foreach($posts as $k=>$v){
       $arr = explode('_', $v);
-      $timestr = ltrim(str_replace($this->posts_dir,'',$arr[0]), "/");
-      $timestr = str_replace(DIRECTORY_SEPARATOR,'',$timestr);
+      $timestr = ltrim($arr[0], $this->dir."/");
       $bits = explode('-', $timestr);
       $date = strtotime($timestr);
-      $link = $this->site_url . date('Y/m/d', $date).'/'.str_replace('.md','',$arr[1]);
+      $link = $this->site_url."/".date('Y/m/d', $date)."/".rtrim($arr[1],'.md');
       $links[] = $link;
     }
     return $links;
@@ -74,8 +72,8 @@ class Posts extends Contents {
     // Extract a specific page with results
     $posts_files = array_slice($posts_files, ($page-1) * $perpage, $perpage);
     $posts = array();
-    foreach($posts_files as $v){
-      $slug = str_replace(".md", "", ltrim(str_replace($this->posts_dir, "", $v), "/"));
+    foreach($posts_files as $v) {
+      $slug = ltrim(rtrim(ltrim($v, $this->dir), ".md"), "/");
       if($this->cache_enabled) {
         $posts[] = $this->read_from_cache($slug);
       } else {
@@ -87,7 +85,7 @@ class Posts extends Contents {
 
   public function find($year, $month, $day, $name){
     foreach($this->list_all() as $el) {
-      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
+      $slug = ltrim(rtrim(ltrim($el, $this->dir), ".md"), "/");
       if($slug=="$year-$month-$day"."_$name") {
         if($this->cache_enabled) {
           return $this->read_from_cache($slug);
@@ -102,7 +100,7 @@ class Posts extends Contents {
   public function year($year){
     $posts = [];
     foreach($this->list_all() as $el) {
-      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
+      $slug = ltrim(rtrim(ltrim($v, $this->dir), ".md"), "/");
       $bits = explode("-", $slug);
       if($bits[0]==$year) {
         if($this->cache_enabled) {
@@ -118,7 +116,7 @@ class Posts extends Contents {
   public function month($year, $month){
     $posts = [];
     foreach($this->list_all() as $el) {
-      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
+      $slug = ltrim(rtrim(ltrim($v, $this->dir), ".md"), "/");
       $bits = explode("-", $slug);
       if($bits[0]==$year && $bits[1]==$month) {
         if($this->cache_enabled) {
@@ -134,7 +132,7 @@ class Posts extends Contents {
   public function day($year, $month, $day){
     $posts = [];
     foreach($this->list_all() as $el) {
-      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
+      $slug = ltrim(rtrim(ltrim($v, $this->dir), ".md"), "/");
       $bits = explode("-", $slug);
       if($bits[0]==$year && $bits[1]==$month && $bits[2]==$day) {
         if($this->cache_enabled) {
@@ -150,7 +148,7 @@ class Posts extends Contents {
   public function name($name) {
     $posts = [];
     foreach($this->list_all() as $el) {
-      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
+      $slug = ltrim(rtrim(ltrim($v, $this->dir), ".md"), "/");
       $bits = explode("_", $slug);
       if(strpos($name, $bits[1])!==false) {
         if($this->cache_enabled) {
@@ -171,10 +169,6 @@ class Posts extends Contents {
       'next'=> $total > $page*$this->posts_per_page,
       'nextpage'=>$page+1
     );
-  }
-
-  public function posts_dir() {
-    return $this->posts_dir;
   }
 
 }

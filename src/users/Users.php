@@ -2,15 +2,16 @@
 
 namespace FlatFileCMS\Users;
 use \Symfony\Component\Yaml\Yaml;
+use \FlatFileCMS\Exceptions\ContentNotFound;
 
 class Users {
 
 	private $conf;
-	private $users_dir;
+	private $dir;
 
 	public function __construct($conf) {
 		$this->conf = $conf;
-		$this->users_dir = $this->conf["users_dir"];
+		$this->dir = rtrim($this->conf["users.dir"], "/");
 	}
 
 	public function write($user) {
@@ -22,11 +23,14 @@ class Users {
 			"role"=>$user->role,
 			"metas"=>$user->metas
 		);
-		file_put_contents($this->users_dir."/".$user->username.".yml", Yaml::dump($to_convert));
+		file_put_contents($this->dir."/".$user->username.".yml", Yaml::dump($to_convert));
 	}
 
 	public function read($id) {
-		$user_yml = Yaml::parse(file_get_contents($this->users_dir."/".$id.".yml"));
+		$filename = $this->dir."/".$id.".yml";
+		if(!file_exists($filename))
+			throw new ContentNotFound($id, $filename, ContentNotFound::USER);
+		$user_yml = Yaml::parse(file_get_contents($filename));
 		$user = new User();
 		$user->username = $user_yml["username"];
 		$user->password = $user_yml["password"];
@@ -38,29 +42,33 @@ class Users {
 	}
 
 	public function delete($id) {
-		unlink($this->users_dir."/".$id.".yml");
+		return unlink($this->dir."/".$id.".yml");
 	}
 
 	public function edit($user) {
-		$this->delete($user->username);
-		$this->write($user);
+		if($this->delete($user->username))
+			$this->write($user);
 	}
 
-	public function list($reverse = true) {
+	public function list_all($reverse = true) {
 		if ($reverse)
-      return array_reverse(glob($this->users_dir . DIRECTORY_SEPARATOR . "*.yml"));
+      return array_reverse(glob($this->dir . "/" . "*.yml"));
     else
-      return glob($this->users_dir . DIRECTORY_SEPARATOR . "*.yml");
+      return glob($this->dir . "/" . "*.yml");
 	}
 
 	public function users() {
-		$elems = $this->list();
+		$elems = $this->list_all();
 		$users = [];
 		foreach ($elems as $el) {
-			$id = str_replace(".yml", "", str_replace($this->users_dir, "", $el));
+			$id = rtrim(ltrim($el, $this->dir), ".yml");
 			$users[] = $this->read($id);
 		}
 		return $users;
+	}
+
+	public function dir() {
+		return $this->dir;
 	}
 
 }

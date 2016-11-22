@@ -17,6 +17,7 @@ class ContentNotFound extends \Exception {
 
 	const PAGE = "page";
 	const POST = "post";
+	const USER = "user";
 	const METAS = "metas (.yml) file";
 	const CACHED = "cached file";
 }
