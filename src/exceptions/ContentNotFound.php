@@ -3,15 +3,20 @@
 namespace FlatFileCMS\Exceptions;
 
 class ContentNotFound extends \Exception {
-	private $name;
+	private $slug;
 	private $type;
+	private $filename;
 
-	public function __construct($name, $type) {
-		$this->name = $name;
+
+	public function __construct($slug, $filename, $type) {
+		$this->slug = $slug;
 		$this->type = $type;
-		$this->message = "The $this->type named: $this->name could not be found.";
+		$this->filename = $filename;
+		$this->message = "The $this->type named: $this->slug could not be found.";
 	}
 
 	const PAGE = "page";
 	const POST = "post";
+	const METAS = "metas (.yml) file";
+	const CACHED = "cached file";
 }

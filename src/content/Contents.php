@@ -5,14 +5,14 @@ use \ParsedownExtra;
 
 class Contents {
 
-	private $parsedown;
-	private $conf;
-	private $cache;
-	private $cache_enabled = false;
-	private $site_url;
+	protected $parsedown;
+	protected $conf;
+	protected $cache;
+	protected $cache_enabled = false;
+	protected $site_url;
 
 	public function __construct($conf) {
-		$this->conf = $config;
+		$this->conf = $conf;
 		$this->parsedown = new ParsedownExtra();
 		if($this->conf["cache_enabled"]=="yes") {
 			$this->cache = new Cache($this->conf["cache_dir"]);

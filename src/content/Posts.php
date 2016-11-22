@@ -3,6 +3,7 @@
 namespace FlatFileCMS\Content;
 use \ParsedownExtra;
 use \Symfony\Component\Yaml\Yaml;
+use \FlatFileCMS\Exceptions\ContentNotFound;
 
 class Posts extends Contents {
 
@@ -10,7 +11,7 @@ class Posts extends Contents {
 	private $posts_per_page;
 
   public function __construct($conf) {
-    super::__construct($conf);
+    parent::__construct($conf);
     $this->posts_dir = $this->conf["posts_dir"];
     $this->posts_per_page = $this->conf["posts_per_page"];
   }
@@ -21,10 +22,16 @@ class Posts extends Contents {
 	}
 
   public function read($slug) {
+    $filename = $this->posts_dir."/".$slug.".md";
+    if(!file_exists($filename))
+      throw new ContentNotFound($slug, $filename, ContentNotFound::POST);
     $post = new Post();
-    $post->markdown = file_get_contents($this->posts_dir."/".$slug.".md");
-    $post->html = $this->parsedown->text($page->markdown);
-    $post->metas = file_get_contents($this->posts_dir."/".$slug.".yml");
+    $post->markdown = file_get_contents($filename);
+    $post->html = $this->parsedown->text($post->markdown);
+    $filename_metas = $this->posts_dir."/".$slug.".yml";
+    if(!file_exists($filename))
+      throw new ContentNotFound($slug, $filename_metas, ContentNotFound::METAS);
+    $post->metas = file_get_contents($filename_metas);
     return $post;
   }
 
@@ -49,7 +56,7 @@ class Posts extends Contents {
     $links = array();
     foreach($posts as $k=>$v){
       $arr = explode('_', $v);
-      $timestr = str_replace($this->posts_dir,'',$arr[0]);
+      $timestr = ltrim(str_replace($this->posts_dir,'',$arr[0]), "/");
       $timestr = str_replace(DIRECTORY_SEPARATOR,'',$timestr);
       $bits = explode('-', $timestr);
       $date = strtotime($timestr);
@@ -65,10 +72,10 @@ class Posts extends Contents {
     }
     $posts_files = $this->list();
     // Extract a specific page with results
-    $posts_files = array_slice($posts, ($page-1) * $perpage, $perpage);
+    $posts_files = array_slice($posts_files, ($page-1) * $perpage, $perpage);
     $posts = array();
-    foreach($posts_file as $v){
-      $slug = str_replace(".md", "", str_replace($this->posts_dir, "", $v));
+    foreach($posts_files as $v){
+      $slug = str_replace(".md", "", ltrim(str_replace($this->posts_dir, "", $v), "/"));
       if($this->cache_enabled) {
         $posts[] = $this->read_from_cache($slug);
       } else {
@@ -80,8 +87,8 @@ class Posts extends Contents {
 
   public function find($year, $month, $day, $name){
     foreach($this->list() as $el) {
-      $slug = str_replace($this->posts_dir, "", $el);
-      if($slug=="$year-$month-$day"."_$name.md") {
+      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
+      if($slug=="$year-$month-$day"."_$name") {
         if($this->cache_enabled) {
           return $this->read_from_cache($slug);
         } else {
@@ -89,13 +96,13 @@ class Posts extends Contents {
         }
       }
     }
-    throw new ContentNotFound($year."-".$month."-".$day."_".$name.".md", ContentNotFound::POST);
+    throw new ContentNotFound($year."-".$month."-".$day."_".$name, "", ContentNotFound::POST);
   }
 
   public function year($year){
     $posts = [];
     foreach($this->list() as $el) {
-      $slug = str_replace($this->posts_dir, "", $el);
+      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("-", $slug);
       if($bits[0]==$year) {
         if($this->cache_enabled) {
@@ -111,7 +118,7 @@ class Posts extends Contents {
   public function month($year, $month){
     $posts = [];
     foreach($this->list() as $el) {
-      $slug = str_replace($this->posts_dir, "", $el);
+      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("-", $slug);
       if($bits[0]==$year && $bits[1]==$month) {
         if($this->cache_enabled) {
@@ -127,7 +134,7 @@ class Posts extends Contents {
   public function day($year, $month, $day){
     $posts = [];
     foreach($this->list() as $el) {
-      $slug = str_replace($this->posts_dir, "", $el);
+      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("-", $slug);
       if($bits[0]==$year && $bits[1]==$month && $bits[2]==$day) {
         if($this->cache_enabled) {
@@ -143,7 +150,7 @@ class Posts extends Contents {
   public function name($name) {
     $posts = [];
     foreach($this->list() as $el) {
-      $slug = str_replace($this->posts_dir, "", $el);
+      $slug = rtrim(ltrim(str_replace($this->posts_dir, "", $el), "/"), ".md");
       $bits = explode("_", $slug);
       if(strpos($name, $bits[1])!==false) {
         if($this->cache_enabled) {

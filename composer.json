@@ -21,7 +21,11 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "FlatFileCMS\\": "src/"
+            "FlatFileCMS\\": "src/",
+            "FlatFileCMS\\Content\\": "src/content",
+            "FlatFileCMS\\Plugins\\": "src/plugins",
+            "FlatFileCMS\\Users\\": "src/users",
+            "FlatFileCMS\\Exceptions\\": "src/exceptions"
         }
     }
 }

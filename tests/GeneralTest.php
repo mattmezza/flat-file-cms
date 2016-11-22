@@ -1,14 +1,13 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use FlatFileCMS\BlogManager;
+use FlatFileCMS\CMS;
 use FlatFileCMS\Exceptions\ContentNotFound;
 use Symfony\Component\Yaml\Yaml;
 
 class GeneralTest extends TestCase {
 
   private $cms;
-
 
   public function __construct() {
     parent::__construct();
@@ -70,7 +69,7 @@ class GeneralTest extends TestCase {
    */
   public function test_get_post_links() {
     $posts_links = $this->cms->posts->links();
-    $this->assertEquals($posts_links[0], "http://localhost:8000/2016/11/test");
+    $this->assertEquals($posts_links[0], "http://localhost:8000/2016/11/15/test");
   }
 
   public function test_users() {

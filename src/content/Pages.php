@@ -3,13 +3,14 @@
 namespace FlatFileCMS\Content;
 use \ParsedownExtra;
 use \Symfony\Component\Yaml\Yaml;
+use \FlatFileCMS\Exceptions\ContentNotFound;
 
 class Pages extends Contents {
 
   private $pages_dir;
 
   public function __construct($conf) {
-    super::__construct($conf);
+    parent::__construct($conf);
     $this->pages_dir = $this->conf["pages_dir"];
   }
 
@@ -23,8 +24,11 @@ class Pages extends Contents {
 	}
 
   public function read($slug) {
+    $filename = $this->pages_dir."/".$slug.".md";
+    if(!file_exists($filename))
+      throw new ContentNotFound($slug, $filename, ContentNotFound::PAGE);
     $page = new Page();
-    $page->markdown = file_get_contents($this->pages_dir."/".$slug.".md");
+    $page->markdown = file_get_contents($filename);
     $page->html = $this->parsedown->text($page->markdown);
     $page->metas = file_get_contents($this->pages_dir."/".$slug.".yml");
     return $page;
@@ -46,8 +50,7 @@ class Pages extends Contents {
     $pages = $this->list();
     $links = array();
     foreach($pages as $el){
-      $name_ext = str_replace($this->pages_dir,'',$el);
-      $name_ext = str_replace(DIRECTORY_SEPARATOR,'',$name_ext);
+      $name_ext = ltrim(str_replace($this->pages_dir,'',$el), "/");
       $link = $this->site_url . str_replace('.md','',$name_ext);
       $links[] = $link;
     }

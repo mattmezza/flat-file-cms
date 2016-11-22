@@ -2,6 +2,7 @@
 
 namespace FlatFileCMS\Content;
 use Symfony\Component\Yaml\Yaml;
+use FlatFileCMS\Exceptions\ContentNotFound;
 
 class Cache {
 
@@ -11,28 +12,27 @@ class Cache {
 		$this->cache_dir = $cache_dir;
 	}
 
-	public function read_page($slug) {
-		$yml_str_from_cache = file_get_contents($this->cache_dir."/".$slug.".cached.yml");
+	public function read($slug) {
+		$filename = $this->cache_dir."/".$slug.".cached.yml";
+		if(!file_exists($filename))
+			throw new ContentNotFound($slug, $filename, ContentNotFound::CACHED);
+		$yml_str_from_cache = file_get_contents($filename);
 		$from_cache = Yaml::parse($yml_str_from_cache);
-		$page = new CachedPage();
-		$page->html = $from_cache["cached"];
-		$page->metas = $from_cache["metas"];
-		$page->cached_on = $from_cache["cached_on"];
-		return $page;
-	}
-
-	public function read_post($slug) {
-		$yml_str_from_cache = file_get_contents($this->cache_dir."/".$slug.".cached.yml");
-		$from_cache = Yaml::parse($yml_str_from_cache);
-		$post = new CachedPost();
-		$post->html = $from_cache["cached"];
-		$post->metas = $from_cache["metas"];
-		$post->cached_on = $from_cache["cached_on"];
-		return $post;
+		$cached_content = null;
+		if($from_cache["type"]==CachedContent::POST) {
+			$cached_content = new CachedPage();
+		} elseif ($from_cache["type"]==CachedContent::PAGE) {
+			$cached_content = new CachedPost();
+		}
+		$cached_content->html = $from_cache["cached"];
+		$cached_content->metas = $from_cache["metas"];
+		$cached_content->cached_on = $from_cache["cached_on"];
+		return $cached_content;
 	}
 
 	public function cache($content) {
 		$to_write = array(
+			"type"=>$content->type(),
 			"metas" => $this->metas,
 			"cached"=> $this->html,
 			"cached_on"=>time()

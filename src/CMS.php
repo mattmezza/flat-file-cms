@@ -4,8 +4,8 @@ namespace FlatFileCMS;
 
 use \Symfony\Component\Yaml\Yaml;
 
-use \FlatFileCMS\Content\Pages
-    \FlatFileCMS\Content\Posts
+use \FlatFileCMS\Content\Pages,
+    \FlatFileCMS\Content\Posts,
     \FlatFileCMS\Users\Users;
 
 class CMS {
