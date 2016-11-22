@@ -6,4 +6,4 @@ Need a CMS module for your PHP website? This one's based on flat files
 
 `composer require mattmezza/flat-file-cms`
 
-Check out `tests/` folder for some usage of the module.
+Check out `tests/` folder for some usage of the module
