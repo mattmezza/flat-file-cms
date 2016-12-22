@@ -1,27 +1,25 @@
-<?php 
+<?php
 
 namespace FlatFileCMS\Plugins;
 
 class BasePlugin {
 
-	private $c;
+	protected $conf;
 
-	public function __construct($config_file) {
-		$general_config = Yaml::parse(file_get_contents($config_file));
-		$this->c = array();
-		foreach ($general_config as $key => $value) {
-			if(strpos("plugin.", $key)==0) {
-				$this->c[str_replace("plugin.", "", $key)] = $value;
-			}
-		}
+	public function __construct($conf) {
+		$this->conf = $conf;
 	}
 
-	public function config($name) {
-		return $this->c[$name];
+	public function conf($name) {
+		return $this->conf[$name];
 	}
 
-	public function config($name, $value) {
-		$this->c[$name] = $value;
+	public function name() {
+		return $this->conf("name");
+	}
+
+	public function type() {
+		return $this->conf("type");
 	}
 
 }

@@ -9,16 +9,25 @@ class Pages extends Contents {
 
   public function __construct($conf) {
     parent::__construct($conf);
-    $this->dir = $this->conf["pages.dir"];
+    $pages = $this->conf->conf("pages");
+    $this->dir = $pages["dir"];
   }
 
   public function edit($page) {
-		if($this->delete($page->slug))
+		if($this->delete($page->slug)) {
 			$this->write($page);
+      foreach ($this->plugins as $plugin) {
+        $plugin->onContentEdited($page->slug, $page->slug, null);
+      }
+    }
 	}
 
   public function delete($slug) {
-    return (unlink($this->dir."/".$slug.".md") && unlink($this->dir."/".$slug.".yml"));
+    $res = (unlink($this->dir."/".$slug.".md") && unlink($this->dir."/".$slug.".yml"));
+    foreach ($this->plugins as $plugin) {
+      $plugin->onContentDeleted($page->slug, $page->slug, null);
+    }
+    return $res;
 	}
 
   public function read($slug) {
@@ -35,6 +44,9 @@ class Pages extends Contents {
   public function write($page) {
 		file_put_contents(rtrim($this->dir,"/")."/".$page->slug.".md", $page->markdown);
 		file_put_contents(rtrim($this->dir,"/")."/".$page->slug.".yml", Yaml::dump($page->metas));
+    foreach ($this->plugins as $plugin) {
+      $plugin->onContentCreated($page->slug, $page->slug, null);
+    }
 	}
 
   public function list_all($reverse = true) {

@@ -12,7 +12,7 @@ class ContentNotFound extends \Exception {
 		$this->slug = $slug;
 		$this->type = $type;
 		$this->filename = $filename;
-		$this->message = "The $this->type named: $this->slug could not be found.";
+		$this->message = "The " .strval($this->type)." named: ".strval($this->slug)." could not be found.";
 	}
 
 	const PAGE = "page";
@@ -20,4 +20,5 @@ class ContentNotFound extends \Exception {
 	const USER = "user";
 	const METAS = "metas (.yml) file";
 	const CACHED = "cached file";
+	const CONF = "conf file";
 }

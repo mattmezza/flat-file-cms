@@ -8,10 +8,13 @@ class Users {
 
 	private $conf;
 	private $dir;
+	private $plugins;
 
 	public function __construct($conf) {
 		$this->conf = $conf;
-		$this->dir = rtrim($this->conf["users.dir"], "/");
+		$users = $this->conf->conf("users");
+		$this->dir = rtrim($users["dir"], "/");
+		$this->plugins = array();
 	}
 
 	public function write($user) {
@@ -69,6 +72,10 @@ class Users {
 
 	public function dir() {
 		return $this->dir;
+	}
+
+	public function add_plugin($plugin) {
+		$this->plugins[] = $plugin;
 	}
 
 }

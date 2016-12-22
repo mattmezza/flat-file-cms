@@ -25,6 +25,7 @@
             "FlatFileCMS\\Content\\": "src/content",
             "FlatFileCMS\\Plugins\\": "src/plugins",
             "FlatFileCMS\\Users\\": "src/users",
+            "FlatFileCMS\\Conf\\": "src/conf",
             "FlatFileCMS\\Exceptions\\": "src/exceptions"
         }
     }

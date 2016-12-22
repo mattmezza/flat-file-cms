@@ -1,7 +1,13 @@
-posts.dir: "tests/posts"
-posts.per_page: 5
-pages.dir: "tests/pages/"
-users.dir: "tests/users/"
-cache.dir: "tests/cache/"
-cache.enabled: no
+posts:
+  dir: "tests/posts"
+  per_page: 5
+pages:
+  dir: "tests/pages/"
+users:
+  dir: "tests/users/"
+cache:
+  dir: "tests/cache/"
+  enabled: no
 url: "http://localhost:8000/"
+plugins:
+  

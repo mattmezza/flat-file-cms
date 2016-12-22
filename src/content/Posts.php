@@ -11,13 +11,17 @@ class Posts extends Contents {
 
   public function __construct($conf) {
     parent::__construct($conf);
-    $this->dir = rtrim($this->conf["posts.dir"], "/");
-    $this->posts_per_page = intval($this->conf["posts.per_page"]);
+		$posts = $this->conf->conf("posts");
+    $this->dir = rtrim($posts["dir"], "/");
+    $this->posts_per_page = intval($posts["per_page"]);
   }
 
   public function write($post) {
 		file_put_contents($this->dir."/".$post->full_slug().".md", $post->markdown);
 		file_put_contents($this->dir."/".$post->full_slug().".yml", Yaml::dump($post->metas));
+		foreach ($this->plugins as $plugin) {
+			$plugin->onContentCreated($post->slug, $post->slug, null);
+		}
 	}
 
   public function read($slug) {
@@ -35,12 +39,20 @@ class Posts extends Contents {
   }
 
   public function edit($post) {
-		if($this->delete($post->slug))
+		if($this->delete($post->slug)) {
 			$this->write($post);
+			foreach ($this->plugins as $plugin) {
+        $plugin->onContentEdited($post->slug, $post->slug, null);
+      }
+		}
 	}
 
   public function delete($slug) {
-		return (unlink($this->dir."/".$slug.".md") && unlink($this->dir."/".$slug.".yml"));
+		$res = (unlink($this->dir."/".$slug.".md") && unlink($this->dir."/".$slug.".yml"));
+		foreach ($this->plugins as $plugin) {
+			$plugin->onContentEdited($post->slug, $post->slug, null);
+		}
+		return $res;
 	}
 
   public function list_all($reverse = true) {

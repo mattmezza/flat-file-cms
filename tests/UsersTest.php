@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 use FlatFileCMS\CMS,
+    FlatFileCMS\Conf\Conf,
     FlatFileCMS\Users\User,
     FlatFileCMS\Exceptions\ContentNotFound;
 
@@ -12,7 +13,8 @@ class UsersTest extends TestCase {
 
   public function __construct() {
     parent::__construct();
-    $this->cms = new CMS(__DIR__."/config.yml");
+    $conf = new Conf(dirname(__FILE__)."/config.yml");
+    $this->cms = new CMS($conf);
   }
 
   public function test_create_user() {

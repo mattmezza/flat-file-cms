@@ -1,8 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use FlatFileCMS\CMS;
-use FlatFileCMS\Exceptions\ContentNotFound;
+use FlatFileCMS\CMS,
+    FlatFileCMS\Conf\Conf,
+    FlatFileCMS\Exceptions\ContentNotFound;
 use Symfony\Component\Yaml\Yaml;
 
 class GeneralTest extends TestCase {
@@ -11,7 +12,8 @@ class GeneralTest extends TestCase {
 
   public function __construct() {
     parent::__construct();
-    $this->cms = new CMS(__DIR__."/config.yml");
+    $conf = new Conf(dirname(__FILE__)."/config.yml");
+    $this->cms = new CMS($conf);
   }
 
   public function test_get_page() {
