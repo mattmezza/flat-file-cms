@@ -85,7 +85,7 @@ class Posts extends Contents {
     $posts_files = array_slice($posts_files, ($page-1) * $perpage, $perpage);
     $posts = array();
     foreach($posts_files as $v) {
-      $slug = ltrim(rtrim(ltrim($v, $this->dir), ".md"), "/");
+      $slug = ltrim(str_replace(".md", "", ltrim($v, $this->dir)), "/");
       if($this->cache_enabled) {
         $posts[] = $this->read_from_cache($slug);
       } else {
